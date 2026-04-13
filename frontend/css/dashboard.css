@@ -88,3 +88,21 @@
 @media (max-width: 768px) {
   .dashboard-grid { grid-template-columns: 1fr; }
 }
+
+/* RPR v2 Specific Styles */
+.score-circle { width: 120px; height: 120px; border-radius: 50%; border: 8px solid var(--primary); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; margin: 0 auto 20px; color: var(--primary); }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.section-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+.progress-mini { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin: 8px 0; }
+.progress-mini-fill { height: 100%; background: var(--primary); }
+.tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.tag { font-size: 11px; padding: 2px 8px; border-radius: 4px; background: rgba(0,0,0,0.05); color: var(--text-muted); border: 1px solid var(--border); }
+.feedback-box { padding: 20px; border-radius: 12px; margin-bottom: 24px; }
+.bg-strength { background: #f0fdf4; border: 1px solid #bbf7d0; }
+.bg-weakness { background: #fef2f2; border: 1px solid #fecaca; }
+.bg-suggestions { background: #f0f9ff; border: 1px solid #bae6fd; }
+
+.feedback-title-strength { color: #166534; }
+.feedback-title-weakness { color: #991b1b; }
+.feedback-title-suggestions { color: #075985; }
+.feedback-list { margin-top: 10px; padding-left: 20px; font-size: 14px; }
