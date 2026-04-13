@@ -1,7 +1,7 @@
 async function initResult() {
   const params = new URLSearchParams(window.location.search);
   const jobId = params.get("job_id");
-  if (!jobId) { window.location.href = "/pages/dashboard.html"; return; }
+  if (!jobId) { window.location.href = "dashboard.html"; return; }
 
   try {
     const job = await api.get(`/status/${jobId}`);

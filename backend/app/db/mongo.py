@@ -18,7 +18,11 @@ async def connect_db():
         _db = _MockDB()
 
 async def close_db():
-    pass
+    global _db, _use_mock
+    if _db and not _use_mock:
+        # motor client is attached to the db object
+        _db.client.close()
+        print("[RPR] MongoDB connection closed")
 
 def get_db():
     return _db

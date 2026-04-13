@@ -10,6 +10,7 @@ from backend.app.services.plagiarism import estimate_similarity
 from backend.app.db.mongo import get_db
 from backend.app.core.settings import settings
 import os
+from fastapi.concurrency import run_in_threadpool
 
 async def log_step(db, job_id: str, step: str, message: str):
     await db.logs.insert_one({
@@ -32,12 +33,12 @@ async def run_pipeline(job_id: str, file_path: str, user_id: str):
     try:
         await update_status("parsing")
         await log_step(db, job_id, "parse", "Extracting text from document")
-        raw_text = parse_file(file_path)
+        raw_text = await run_in_threadpool(parse_file, file_path)
         word_count = len(raw_text.split())
 
         await update_status("splitting")
         await log_step(db, job_id, "split", f"Splitting into sections ({word_count} words)")
-        sections = split_sections(raw_text)
+        sections = await run_in_threadpool(split_sections, raw_text)
 
         refined_sections = []
         for i, section in enumerate(sections):
@@ -55,10 +56,10 @@ async def run_pipeline(job_id: str, file_path: str, user_id: str):
 
         output_path = os.path.join(settings.OUTPUT_DIR, f"{job_id}.docx")
         await log_step(db, job_id, "reconstruct", "Reconstructing final document")
-        reconstruct(refined_sections, output_path)
+        await run_in_threadpool(reconstruct, refined_sections, output_path)
 
         refined_text = " ".join(s["refined"] for s in refined_sections)
-        similarity = estimate_similarity(raw_text, refined_text)
+        similarity = await run_in_threadpool(estimate_similarity, raw_text, refined_text)
         elapsed = round(time.time() - start, 2)
 
         await update_status(
