@@ -7,13 +7,15 @@ def _get_client():
     return genai.Client(api_key=settings.GEMINI_API_KEY)
 
 async def call_llm(prompt: str, content: str, retries: int = 3) -> str:
-    """Calls the new, unified Google Gen AI SDK (google-genai)."""
+    """Calls the official Google Gen AI SDK."""
     if not settings.GEMINI_API_KEY:
         raise RuntimeError("GEMINI_API_KEY is not set in .env")
 
     client = _get_client()
     
-    # Use proper GenerateContentConfig for system instructions and parameters
+    # Cleaning the model name just in case
+    model_name = settings.GEMINI_MODEL.strip().replace("models/", "")
+    
     config = types.GenerateContentConfig(
         system_instruction=prompt,
         temperature=0.7,
@@ -22,20 +24,25 @@ async def call_llm(prompt: str, content: str, retries: int = 3) -> str:
 
     for attempt in range(retries):
         try:
-            # Utilizing the modern async 'aio' interface of the google-genai SDK
+            # Using the modern asynchronous interface
             response = await client.aio.models.generate_content(
-                model=settings.GEMINI_MODEL,
+                model=model_name,
                 contents=content,
                 config=config
             )
             
-            if not response.text:
+            if not response or not response.text:
                 raise RuntimeError("Empty response from Gemini")
                 
             return response.text
             
         except Exception as e:
+            # Check for common errors
+            err_str = str(e)
+            if "404" in err_str:
+                raise RuntimeError(f"Model '{model_name}' not found. Please check your GEMINI_MODEL in .env. Error: {err_str}")
+            
             if attempt == retries - 1:
-                # Provide a clean error message for the dashboard
-                raise RuntimeError(f"Gemini API failure: {str(e)}")
+                raise RuntimeError(f"Gemini API failure: {err_str}")
+            
             await asyncio.sleep(2 ** attempt)

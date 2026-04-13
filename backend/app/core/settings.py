@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     MONGO_DB: str = "rpr_db"
 
     GEMINI_API_KEY: str = ""
-    GEMINI_MODEL: str = "gemini-1.5-flash"
+    GEMINI_MODEL: str = "gemini-2.0-flash"
 
     REDIS_URL: str = "redis://localhost:6379"
 
