@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RPR - AI Research Paper Refinement</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    .hero { text-align: center; padding: 100px 24px 60px; }
+    .hero h1 { font-size: 52px; font-weight: 800; letter-spacing: -2px; line-height: 1.1; margin-bottom: 20px; }
+    .hero h1 span { color: var(--primary); }
+    .hero p { font-size: 18px; color: var(--text-muted); max-width: 560px; margin: 0 auto 36px; }
+    .hero-btns { display: flex; gap: 12px; justify-content: center; }
+    .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 900px; margin: 60px auto; padding: 0 24px; }
+    .feature-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+    .feature-card .icon { font-size: 32px; margin-bottom: 12px; }
+    .feature-card h3 { font-size: 16px; margin-bottom: 8px; }
+    .feature-card p { font-size: 14px; color: var(--text-muted); }
+    @media (max-width: 768px) { .features { grid-template-columns: 1fr; } .hero h1 { font-size: 36px; } }
+  </style>
+</head>
+<body>
+  <nav>
+    <span class="nav-brand">RPR</span>
+    <div class="nav-links">
+      <a href="login.html" class="btn btn-outline">Sign In</a>
+      <a href="signup.html" class="btn btn-primary">Get Started</a>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <h1>Refine Research Papers<br/>with <span>AI Precision</span></h1>
+    <p>Upload your academic paper and let our AI pipeline humanize, paraphrase, and improve it while preserving your original meaning.</p>
+    <div class="hero-btns">
+      <a href="signup.html" class="btn btn-primary">Start for Free →</a>
+      <a href="login.html" class="btn btn-outline">Sign In</a>
+    </div>
+  </div>
+
+  <div class="features">
+    <div class="feature-card">
+      <div class="icon">🧠</div>
+      <h3>AI-Powered Refinement</h3>
+      <p>Groq LLM pipeline with humanization, paraphrasing, and grammar correction stages.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">⚡</div>
+      <h3>Async Processing</h3>
+      <p>Upload and go. Background processing with real-time status tracking.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">📄</div>
+      <h3>PDF & DOCX Support</h3>
+      <p>Upload PDF, DOCX, or TXT files. Download refined output as DOCX.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🔐</div>
+      <h3>Secure & Private</h3>
+      <p>JWT authentication. Your documents are private and securely stored.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">📊</div>
+      <h3>Metrics & Analytics</h3>
+      <p>Word count, processing time, and similarity score for every job.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🎓</div>
+      <h3>Academic Integrity</h3>
+      <p>Preserves academic meaning, citations, and formal tone throughout.</p>
+    </div>
+  </div>
+</body>
+</html>

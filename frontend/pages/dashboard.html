@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - RPR</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../css/dashboard.css" />
+</head>
+<body>
+  <nav>
+    <span class="nav-brand">RPR</span>
+    <div class="nav-links">
+      <span class="text-muted text-14">Welcome, <strong id="user-name">...</strong></span>
+      <button class="btn btn-outline" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h2 class="mb-24">Upload Research Paper</h2>
+
+    <div class="card mb-32">
+      <div class="upload-zone" id="upload-zone">
+        <div class="upload-icon">📄</div>
+        <h3>Drop your file here or click to browse</h3>
+        <p>Supports PDF, DOCX, TXT (max 20MB)</p>
+        <input type="file" id="file-input" accept=".pdf,.docx,.txt" class="hidden" title="Upload research paper" placeholder="Upload research paper file" />
+      </div>
+      <div class="mt-16 flex-wrap-gap">
+        <span id="file-info" class="hidden text-14 text-muted"></span>
+        <button id="upload-btn" class="btn btn-primary" disabled>Start Refinement</button>
+      </div>
+    </div>
+
+    <h2 class="mb-16">Recent Jobs</h2>
+    <div class="card">
+      <p id="no-jobs" class="hidden text-muted text-center p-24">No jobs yet. Upload a paper to get started.</p>
+      <table class="jobs-table hidden" id="jobs-table">
+        <thead>
+          <tr>
+            <th>File</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="jobs-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/upload.js"></script>
+  <script src="../js/process.js"></script>
+  <script>
+    requireAuth();
+    initDashboard();
+    initUpload();
+  </script>
+</body>
+</html>

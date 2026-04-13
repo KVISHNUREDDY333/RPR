@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Result - RPR</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../css/dashboard.css" />
+</head>
+<body>
+  <nav>
+    <span class="nav-brand">RPR</span>
+    <div class="nav-links">
+      <a href="dashboard.html" class="btn btn-outline">← Dashboard</a>
+    </div>
+  </nav>
+
+  <div class="container max-w-700">
+    <div class="card">
+      <div class="text-center py-16-24">
+        <div class="text-48 mb-12">✅</div>
+        <h2 class="mb-6">Refinement Complete</h2>
+        <p class="text-muted text-14" id="filename">Document</p>
+      </div>
+
+      <div class="dashboard-grid mb-24">
+        <div class="stat-card">
+          <div class="stat-value" id="word-count">-</div>
+          <div class="stat-label">Word Count</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="proc-time">-</div>
+          <div class="stat-label">Processing Time</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="similarity">-</div>
+          <div class="stat-label">Similarity Score</div>
+        </div>
+      </div>
+
+      <div class="info-box">
+        ⚠️ Similarity score reflects semantic closeness to the original. Lower scores indicate more variation. Academic meaning is preserved throughout.
+      </div>
+
+      <button id="download-btn" class="btn btn-primary w-full justify-center btn-lg">
+        ⬇️ Download Refined Document
+      </button>
+
+      <div class="text-center mt-16">
+        <a href="dashboard.html" class="text-14 text-muted">Process another paper →</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/download.js"></script>
+  <script>
+    requireAuth();
+    initResult();
+  </script>
+</body>
+</html>

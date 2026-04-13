@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Processing - RPR</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../css/dashboard.css" />
+</head>
+<body>
+  <nav>
+    <span class="nav-brand">RPR</span>
+    <div class="nav-links">
+      <a href="dashboard.html" class="btn btn-outline">← Dashboard</a>
+    </div>
+  </nav>
+
+  <div class="container max-w-700">
+    <div class="card">
+      <div class="flex-center-between mb-20">
+        <h2>Processing Document</h2>
+        <span id="status-badge" class="badge badge-queued">queued</span>
+      </div>
+
+      <p class="text-13 text-muted mb-20">
+        Job ID: <code id="job-id-display" class="text-primary"></code>
+      </p>
+
+      <div class="progress-bar mb-8">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <div class="flex-center-between text-13 text-muted mb-24">
+        <span id="status-msg">Initializing...</span>
+        <span id="progress-text">0%</span>
+      </div>
+
+      <h3 class="text-14 mb-10 text-muted">Pipeline Logs</h3>
+      <ul class="log-list" id="log-list">
+        <li><span class="step">[info]</span>Waiting for pipeline to start...</li>
+      </ul>
+    </div>
+
+    <div class="text-center mt-20">
+      <a href="dashboard.html" class="text-14 text-muted">← Back to Dashboard</a>
+    </div>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/status.js"></script>
+  <script>
+    requireAuth();
+    initProcessing();
+  </script>
+</body>
+</html>
