@@ -23,23 +23,26 @@ async def _get_user(token: str):
     return user
 
 @router.get("/download/{job_id}")
-async def download_result(job_id: str, token: str = Query(...)):
+async def download_result(job_id: str, type: str = "refined", token: str = Query(...)):
     user = await _get_user(token)
     db = get_db()
     job = await db.jobs.find_one({"job_id": job_id, "user_id": user["id"]})
 
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
-    if job["status"] != "completed":
-        raise HTTPException(status_code=400, detail=f"Job status: {job['status']}")
+    
+    if type == "report":
+        path = job.get("report_path")
+        filename = f"Review_Report_{job_id}.docx"
+    else:
+        path = job.get("output_path")
+        filename = f"Refined_{job.get('original_filename', job_id)}.docx"
 
-    output_path = job.get("output_path")
-    if not output_path or not os.path.exists(output_path):
-        raise HTTPException(status_code=404, detail="Output file not found")
+    if not path or not os.path.exists(path):
+        raise HTTPException(status_code=404, detail="File not found")
 
-    name_no_ext = os.path.splitext(job.get("original_filename", job_id))[0]
     return FileResponse(
-        path=output_path,
+        path=path,
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        filename=f"refined_{name_no_ext}.docx"
+        filename=filename
     )

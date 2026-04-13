@@ -16,9 +16,10 @@ async def get_status(job_id: str, user=Depends(get_current_user)):
         "status": job["status"],
         "progress": job.get("progress", 0),
         "original_filename": job.get("original_filename"),
-        "word_count": job.get("word_count"),
+        "overall_score": job.get("overall_score"),
+        "analysis": job.get("analysis", []),
+        "feedback": job.get("feedback", {}),
         "processing_time": job.get("processing_time"),
-        "similarity_score": job.get("similarity_score"),
         "error": job.get("error"),
         "created_at": job["created_at"].isoformat(),
         "updated_at": job["updated_at"].isoformat()
@@ -34,6 +35,7 @@ async def list_jobs(user=Depends(get_current_user)):
             "job_id": job["job_id"],
             "status": job["status"],
             "original_filename": job.get("original_filename"),
+            "overall_score": job.get("overall_score"),
             "created_at": job["created_at"].isoformat()
         })
     return jobs

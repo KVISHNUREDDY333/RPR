@@ -3,51 +3,72 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Result - RPR</title>
+  <title>Deep Review - RPR v2</title>
   <link rel="stylesheet" href="../css/styles.css" />
   <link rel="stylesheet" href="../css/dashboard.css" />
+  <style>
+    .score-circle { width: 120px; height: 120px; border-radius: 50%; border: 8px solid var(--primary); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; margin: 0 auto 20px; color: var(--primary); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .section-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+    .progress-mini { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin: 8px 0; }
+    .progress-mini-fill { height: 100%; background: var(--primary); }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .tag { font-size: 11px; padding: 2px 8px; border-radius: 4px; background: rgba(0,0,0,0.05); color: var(--text-muted); border: 1px solid var(--border); }
+    .feedback-box { padding: 20px; border-radius: 12px; margin-bottom: 24px; }
+    .bg-strength { background: #f0fdf4; border: 1px solid #bbf7d0; }
+    .bg-weakness { background: #fef2f2; border: 1px solid #fecaca; }
+    .bg-suggestions { background: #f0f9ff; border: 1px solid #bae6fd; }
+    @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+  </style>
 </head>
 <body>
   <nav>
-    <span class="nav-brand">RPR</span>
+    <span class="nav-brand">RPR v2</span>
     <div class="nav-links">
       <a href="dashboard.html" class="btn btn-outline">← Dashboard</a>
     </div>
   </nav>
 
-  <div class="container max-w-700">
-    <div class="card">
-      <div class="text-center py-16-24">
-        <div class="text-48 mb-12">✅</div>
-        <h2 class="mb-6">Refinement Complete</h2>
-        <p class="text-muted text-14" id="filename">Document</p>
-      </div>
+  <div class="container container-wide">
+    <div class="text-center mb-40">
+      <div class="score-circle" id="overall-score">0.0</div>
+      <h1>Academic Quality Analysis</h1>
+      <p class="text-muted" id="filename-display">Document Analysis</p>
+    </div>
 
-      <div class="dashboard-grid mb-24">
-        <div class="stat-card">
-          <div class="stat-value" id="word-count">-</div>
-          <div class="stat-label">Word Count</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="proc-time">-</div>
-          <div class="stat-label">Processing Time</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="similarity">-</div>
-          <div class="stat-label">Similarity Score</div>
+    <div class="grid-2">
+      <!-- Left Column: Section Analysis -->
+      <div>
+        <h2 class="mb-16">Section-wise Performance</h2>
+        <div id="sections-container">
+          <!-- Dynamically populated -->
         </div>
       </div>
 
-      <div class="info-box">
-        ⚠️ Similarity score reflects semantic closeness to the original. Lower scores indicate more variation. Academic meaning is preserved throughout.
-      </div>
+      <!-- Right Column: Feedback & Actions -->
+      <div>
+        <h2 class="mb-16">Overall Feedback</h2>
+        
+        <div class="feedback-box bg-strength">
+          <h3 style="color:#166534">✨ Strengths</h3>
+          <ul id="strengths-list" style="margin-top:10px; padding-left:20px; font-size:14px;"></ul>
+        </div>
 
-      <button id="download-btn" class="btn btn-primary w-full justify-center btn-lg">
-        ⬇️ Download Refined Document
-      </button>
+        <div class="feedback-box bg-weakness">
+          <h3 style="color:#991b1b">⚠️ Weaknesses</h3>
+          <ul id="weaknesses-list" style="margin-top:10px; padding-left:20px; font-size:14px;"></ul>
+        </div>
 
-      <div class="text-center mt-16">
-        <a href="dashboard.html" class="text-14 text-muted">Process another paper →</a>
+        <div class="feedback-box bg-suggestions">
+          <h3 style="color:#075985">💡 Actionable Suggestions</h3>
+          <ul id="suggestions-list" style="margin-top:10px; padding-left:20px; font-size:14px;"></ul>
+        </div>
+
+        <div class="card p-24">
+          <h3 class="mb-16">Download Documents</h3>
+          <button id="download-refined" class="btn btn-primary w-full justify-center mb-12">⬇️ Download Refined Paper</button>
+          <button id="download-report" class="btn btn-outline w-full justify-center">📄 Download Review Report</button>
+        </div>
       </div>
     </div>
   </div>
@@ -57,7 +78,7 @@
   <script src="../js/download.js"></script>
   <script>
     requireAuth();
-    initResult();
+    initResultV2();
   </script>
 </body>
 </html>

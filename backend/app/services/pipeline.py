@@ -1,16 +1,19 @@
 import time
+import os
 from datetime import datetime
+from fastapi.concurrency import run_in_threadpool
+
 from backend.app.services.parser import parse_file
 from backend.app.services.section_splitter import split_sections
-from backend.app.services.humanizer import humanize
-from backend.app.services.paraphraser import paraphrase
-from backend.app.services.grammar import improve_grammar
+from backend.app.services.reviewer import review_section
+from backend.app.services.scorer import score_section
+from backend.app.services.humanizer import humanize # We can still use these or consolidate
 from backend.app.services.reconstruction import reconstruct
-from backend.app.services.plagiarism import estimate_similarity
+from backend.app.services.report_generator import generate_review_report
+from backend.app.services.feedback_generator import generate_overall_feedback
+
 from backend.app.db.mongo import get_db
 from backend.app.core.settings import settings
-import os
-from fastapi.concurrency import run_in_threadpool
 
 async def log_step(db, job_id: str, step: str, message: str):
     await db.logs.insert_one({
@@ -31,46 +34,79 @@ async def run_pipeline(job_id: str, file_path: str, user_id: str):
         )
 
     try:
+        # 1. Parse
         await update_status("parsing")
         await log_step(db, job_id, "parse", "Extracting text from document")
         raw_text = await run_in_threadpool(parse_file, file_path)
-        word_count = len(raw_text.split())
-
+        
+        # 2. Split
         await update_status("splitting")
-        await log_step(db, job_id, "split", f"Splitting into sections ({word_count} words)")
+        await log_step(db, job_id, "split", "Analyzing structure and splitting sections")
         sections = await run_in_threadpool(split_sections, raw_text)
 
+        section_analysis = []
         refined_sections = []
+        total_score = 0
+
+        # 3. Process each section (Review, Score, Refine)
         for i, section in enumerate(sections):
-            await log_step(db, job_id, "humanize", f"Humanizing section: {section['title']}")
-            humanized = await humanize(section["content"])
+            section_title = section["title"]
+            await update_status("processing", progress=round((i / len(sections)) * 100))
+            await log_step(db, job_id, "review", f"Reviewing & Scoring: {section_title}")
+            
+            # AI Review & Score
+            review_data = await review_section(section["content"])
+            score_data = await score_section(section["content"])
+            
+            section_analysis.append({
+                "title": section_title,
+                "score": score_data["score"],
+                "reason": score_data["reason"],
+                "clarity": review_data["clarity_rating"],
+                "issues": review_data["issues"]
+            })
+            total_score += score_data["score"]
 
-            await log_step(db, job_id, "paraphrase", f"Paraphrasing section: {section['title']}")
-            paraphrased = await paraphrase(humanized)
+            # AI Refinement (Humanization + Grammar)
+            await log_step(db, job_id, "refine", f"Refining content: {section_title}")
+            refined_content = await humanize(section["content"]) 
+            refined_sections.append({"title": section_title, "refined": refined_content})
 
-            await log_step(db, job_id, "grammar", f"Grammar check: {section['title']}")
-            final = await improve_grammar(paraphrased)
+        # 4. Global Feedback
+        await update_status("finalizing")
+        await log_step(db, job_id, "feedback", "Generating overall feedback & report")
+        
+        analysis_summary = "\n".join([f"{s['title']} (Score: {s['score']}): {s['reason']}" for s in section_analysis])
+        feedback = await generate_overall_feedback(analysis_summary)
+        
+        # 5. Document Reconstruction (Refined Paper)
+        refined_output_path = os.path.join(settings.OUTPUT_DIR, f"refined_{job_id}.docx")
+        await run_in_threadpool(reconstruct, refined_sections, refined_output_path)
 
-            refined_sections.append({"title": section["title"], "refined": final})
-            await update_status("processing", progress=round((i + 1) / len(sections) * 100))
+        # 6. Report Generation
+        report_path = os.path.join(settings.OUTPUT_DIR, f"report_{job_id}.docx")
+        report_data = {
+            **feedback,
+            "section_analysis": section_analysis,
+            "overall_score": round(total_score / len(sections), 1) if sections else 0
+        }
+        await run_in_threadpool(generate_review_report, report_data, report_path)
 
-        output_path = os.path.join(settings.OUTPUT_DIR, f"{job_id}.docx")
-        await log_step(db, job_id, "reconstruct", "Reconstructing final document")
-        await run_in_threadpool(reconstruct, refined_sections, output_path)
-
-        refined_text = " ".join(s["refined"] for s in refined_sections)
-        similarity = await run_in_threadpool(estimate_similarity, raw_text, refined_text)
+        # 7. Complete Job
         elapsed = round(time.time() - start, 2)
-
         await update_status(
             "completed",
-            output_path=output_path,
-            word_count=word_count,
-            processing_time=elapsed,
-            similarity_score=similarity
+            progress=100,
+            output_path=refined_output_path,
+            report_path=report_path,
+            overall_score=report_data["overall_score"],
+            analysis=section_analysis,
+            feedback=feedback,
+            processing_time=elapsed
         )
-        await log_step(db, job_id, "done", f"Completed in {elapsed}s. Similarity: {similarity}")
+        await log_step(db, job_id, "done", f"Analysis complete in {elapsed}s")
 
     except Exception as e:
         await update_status("failed", error=str(e))
         await log_step(db, job_id, "error", str(e))
+        print(f"[Pipeline Error] {str(e)}")
