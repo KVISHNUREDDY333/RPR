@@ -10,8 +10,8 @@ class Settings(BaseSettings):
     MONGO_URI: str = "mongodb://localhost:27017"
     MONGO_DB: str = "rpr_db"
 
-    GROQ_API_KEY: str = ""
-    GROQ_MODEL: str = "llama3-8b-8192"
+    GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-1.5-flash"
 
     REDIS_URL: str = "redis://localhost:6379"
 

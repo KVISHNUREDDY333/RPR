@@ -1,37 +1,33 @@
-import httpx
 import asyncio
+import google.generativeai as genai
 from backend.app.core.settings import settings
 
-GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
+def _get_model():
+    genai.configure(api_key=settings.GEMINI_API_KEY)
+    return genai.GenerativeModel(settings.GEMINI_MODEL)
 
-async def call_groq(prompt: str, content: str, retries: int = 3) -> str:
-    headers = {
-        "Authorization": f"Bearer {settings.GROQ_API_KEY}",
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "model": settings.GROQ_MODEL,
-        "messages": [
-            {"role": "system", "content": prompt},
-            {"role": "user", "content": content}
-        ],
-        "temperature": 0.7,
-        "max_tokens": 4096
-    }
+async def call_llm(prompt: str, content: str, retries: int = 3) -> str:
+    """Calls Google Gemini API with system prompt and user content."""
+    if not settings.GEMINI_API_KEY:
+        raise RuntimeError("GEMINI_API_KEY is not set in .env")
+
+    model = _get_model()
     
     for attempt in range(retries):
         try:
-            async with httpx.AsyncClient(timeout=90) as client:
-                resp = await client.post(GROQ_URL, json=payload, headers=headers)
-                if resp.status_code != 200:
-                    error_msg = f"Groq API Error {resp.status_code}: {resp.text}"
-                    print(f"[LLM] {error_msg}")
-                    if resp.status_code == 400:
-                        raise RuntimeError(f"Bad Request: {resp.text}")
-                    resp.raise_for_status()
+            # Combining system prompt and user content for Gemini
+            # (Gemini 1.5 supports system_instruction, but for simplicity/compatibility 
+            # we can also just prepend it)
+            response = await model.generate_content_async(
+                f"{prompt}\n\nContent to process:\n{content}"
+            )
+            
+            if not response.text:
+                raise RuntimeError("Empty response from Gemini")
                 
-                return resp.json()["choices"][0]["message"]["content"]
+            return response.text
+            
         except Exception as e:
             if attempt == retries - 1:
-                raise RuntimeError(f"Groq API failed after {retries} attempts: {str(e)}")
+                raise RuntimeError(f"Gemini API failed after {retries} attempts: {str(e)}")
             await asyncio.sleep(2 ** attempt)

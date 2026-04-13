@@ -1,6 +1,6 @@
 # RPR — AI Research Paper Refinement System
 
-A production-ready SaaS application that refines academic research papers using a multi-stage AI pipeline powered by Groq LLM.
+A production-ready SaaS application that refines academic research papers using a multi-stage AI pipeline powered by Google Gemini.
 
 ---
 
@@ -15,7 +15,7 @@ User → Frontend (HTML/JS) → FastAPI Backend → MongoDB
                                     ↓
                     Paraphraser → Grammar → Reconstruct
                                     ↓
-                          Groq LLM (llama3-8b-8192)
+                    Google Gemini (gemini-1.5-flash)
                                     ↓
                           Output DOCX → Download
 ```
@@ -29,7 +29,7 @@ User → Frontend (HTML/JS) → FastAPI Backend → MongoDB
 | Backend    | FastAPI, Python 3.11                   |
 | Database   | MongoDB (Motor async driver)           |
 | Auth       | JWT (python-jose) + bcrypt             |
-| AI/LLM     | Groq API (llama3-8b-8192)              |
+| AI/LLM     | Google Gemini API                      |
 | Embeddings | Sentence Transformers (MiniLM)         |
 | Frontend   | HTML, CSS, Vanilla JS                  |
 | Infra      | Docker, docker-compose                 |
@@ -42,13 +42,13 @@ User → Frontend (HTML/JS) → FastAPI Backend → MongoDB
 ### 1. Prerequisites
 
 - Docker & docker-compose
-- Groq API key → <https://console.groq.com>
+- Gemini API key → <https://aistudio.google.com/app/apikey>
 
 ### 2. Configure environment
 
 ```bash
 cp .env .env.local
-# Edit .env — set GROQ_API_KEY and SECRET_KEY
+# Edit .env — set GEMINI_API_KEY and SECRET_KEY
 ```
 
 ### 3. Run with Docker
