@@ -24,7 +24,9 @@ async function apiRequest(method, path, body = null, isFormData = false) {
 }
 
 const api = {
-  get: (path) => apiRequest("GET", path),
-  post: (path, body) => apiRequest("POST", path, body),
-  postForm: (path, formData) => apiRequest("POST", path, formData, true),
+  get:      (path)       => apiRequest("GET",    path),
+  post:     (path, body) => apiRequest("POST",   path, body),
+  put:      (path, body) => apiRequest("PUT",    path, body),
+  delete:   (path)       => apiRequest("DELETE", path),
+  postForm: (path, fd)   => apiRequest("POST",   path, fd, true),
 };

@@ -1,15 +1,22 @@
 let pollInterval = null;
 
+const STATUS_MESSAGES = {
+  queued:     "Queued — waiting to start...",
+  parsing:    "Parsing document...",
+  splitting:  "Analyzing structure...",
+  processing: "AI is reviewing and refining sections...",
+  finalizing: "Generating feedback and report...",
+  completed:  "Complete! Redirecting to results...",
+  failed:     "Processing failed."
+};
+
 async function pollStatus(jobId) {
   try {
     const job = await api.get(`/status/${jobId}`);
     updateUI(job);
-
     if (job.status === "completed") {
       clearInterval(pollInterval);
-      setTimeout(() => {
-        window.location.href = `result.html?job_id=${jobId}`;
-      }, 1500);
+      setTimeout(() => { window.location.href = `result.html?job_id=${jobId}`; }, 1200);
     } else if (job.status === "failed") {
       clearInterval(pollInterval);
     }
@@ -24,51 +31,37 @@ async function pollLogs(jobId) {
     const list = document.getElementById("log-list");
     if (!list || !logs.length) return;
     list.innerHTML = logs.map(l =>
-      `<li><span class="step">[${l.step}]</span> ${l.message}</li>`
+      `<li><span class="step">[${l.step}]</span>${l.message}</li>`
     ).join("");
     list.scrollTop = list.scrollHeight;
   } catch (_) {}
 }
 
 function updateUI(job) {
-  const statusEl = document.getElementById("status-badge");
-  const progressFill = document.getElementById("progress-fill");
-  const progressText = document.getElementById("progress-text");
-  const statusMsg = document.getElementById("status-msg");
+  const badge = document.getElementById("status-badge");
+  const fill  = document.getElementById("progress-fill");
+  const pct   = document.getElementById("progress-text");
+  const msg   = document.getElementById("status-msg");
 
-  if (statusEl) {
-    statusEl.textContent = job.status;
-    statusEl.className = `badge badge-${job.status}`;
-  }
+  if (badge) { badge.textContent = job.status; badge.className = `badge badge-${job.status}`; }
 
   const progress = job.progress || 0;
-  if (progressFill) progressFill.style.width = `${progress}%`;
-  if (progressText) progressText.textContent = `${progress}%`;
-
-  const messages = {
-    queued: "Your document is queued for processing...",
-    parsing: "Extracting text from document...",
-    splitting: "Splitting into sections...",
-    processing: `Refining sections with AI... ${progress}%`,
-    completed: "✅ Refinement complete! Redirecting...",
-    failed: `❌ Processing failed: ${job.error || "Unknown error"}`
-  };
-  if (statusMsg) statusMsg.textContent = messages[job.status] || job.status;
+  if (fill) fill.style.width = `${progress}%`;
+  if (pct)  pct.textContent  = `${progress}%`;
+  if (msg)  msg.textContent  = job.status === "failed"
+    ? `Failed: ${job.error || "Unknown error"}`
+    : (STATUS_MESSAGES[job.status] || job.status);
 }
 
 function initProcessing() {
   const params = new URLSearchParams(window.location.search);
   const jobId = params.get("job_id");
-  if (!jobId) {
-    window.location.href = "dashboard.html";
-    return;
-  }
+  if (!jobId) { window.location.href = "dashboard.html"; return; }
 
-  document.getElementById("job-id-display").textContent = jobId;
+  const display = document.getElementById("job-id-display");
+  if (display) display.textContent = jobId;
+
   pollStatus(jobId);
   pollLogs(jobId);
-  pollInterval = setInterval(() => {
-    pollStatus(jobId);
-    pollLogs(jobId);
-  }, 3000);
+  pollInterval = setInterval(() => { pollStatus(jobId); pollLogs(jobId); }, 2500);
 }

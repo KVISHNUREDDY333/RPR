@@ -1,14 +1,14 @@
 from backend.app.llm.llm_service import call_llm
+from backend.app.llm.prompts import SCORE_PROMPT
 
-SCORING_PROMPT = """Score the following research paper section from 0 to 10 based on academic quality, rigorous methodology, and theoretical contribution.
-
-Return valid JSON:
-{
-  "score": number, 
-  "reason": "string"
-}
-"""
-
-async def score_section(content: str) -> dict:
-    """Assign an academic score to a section."""
-    return await call_llm(SCORING_PROMPT, content, is_json=True)
+async def score_section(text: str) -> dict:
+    try:
+        result = await call_llm(SCORE_PROMPT, text, is_json=True)
+        score = float(result.get("score", 5.0))
+        score = max(0.0, min(10.0, score))
+        return {
+            "score": round(score, 1),
+            "reason": result.get("reason", "No reason provided")
+        }
+    except Exception:
+        return {"score": 5.0, "reason": "Could not evaluate this section"}

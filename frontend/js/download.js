@@ -1,70 +1,96 @@
-async function initResultV2() {
+async function initResult() {
   const params = new URLSearchParams(window.location.search);
   const jobId = params.get("job_id");
   if (!jobId) { window.location.href = "dashboard.html"; return; }
 
   try {
     const job = await api.get(`/status/${jobId}`);
+
     if (job.status !== "completed") {
       window.location.href = `processing.html?job_id=${jobId}`;
       return;
     }
 
-    // Populate Overall Score
-    document.getElementById("overall-score").textContent = job.overall_score || "0.0";
-    document.getElementById("filename-display").textContent = job.original_filename || "Document Analysis";
+    // Header
+    document.getElementById("filename-display").textContent = job.original_filename || "Document";
 
-    // Populate Sections
-    const sectionsContainer = document.getElementById("sections-container");
-    sectionsContainer.innerHTML = (job.analysis || []).map(s => `
-      <div class="section-card">
-        <div class="flex-center-between">
-          <strong class="text-14">${s.title}</strong>
-          <span class="text-primary font-bold">${s.score}/10</span>
-        </div>
-        <div class="progress-mini">
-          <div class="progress-mini-fill" style="width: ${s.score * 10}%"></div>
-        </div>
-        <p class="text-12 text-muted mt-4">${s.reason}</p>
-        <div class="tag-list">
-          <span class="tag">Clarity: ${s.clarity}</span>
-          ${(s.issues || []).map(issue => `<span class="tag">Issue: ${issue}</span>`).join("")}
-        </div>
-      </div>
-    `).join("");
+    // Score ring
+    const score = job.overall_score || 0;
+    document.getElementById("overall-score").textContent = score;
+    const ring = document.getElementById("score-ring");
+    if (ring) ring.style.setProperty("--pct", score * 10);
 
-    // Populate Feedback Lists
-    const feedback = job.feedback || {};
-    populateList("strengths-list", feedback.strengths);
-    populateList("weaknesses-list", feedback.weaknesses);
-    populateList("suggestions-list", feedback.suggestions);
+    // Stats
+    document.getElementById("word-count").textContent = job.word_count ? job.word_count.toLocaleString() : "—";
+    document.getElementById("proc-time").textContent = job.processing_time ? `${job.processing_time}s` : "—";
+    const analysis = job.analysis || [];
+    document.getElementById("section-count").textContent = analysis.length || "—";
 
-    // Setup Downloads
-    setupDownloadButton("download-refined", jobId, "refined");
-    setupDownloadButton("download-report", jobId, "report");
+    // Section Analysis
+    const container = document.getElementById("sections-container");
+    if (analysis.length) {
+      container.innerHTML = analysis.map(s => {
+        const pct = (s.score || 0) * 10;
+        const issues = (s.issues || []).map(i => `<span class="tag tag-issue">${i}</span>`).join("");
+        const suggestions = (s.suggestions || []).map(i => `<span class="tag">${i}</span>`).join("");
+        return `<div class="section-card">
+          <div class="flex-between mb-8">
+            <strong class="text-sm">${s.title}</strong>
+            <span class="text-primary font-bold">${s.score}/10</span>
+          </div>
+          <div class="section-score-bar">
+            <div class="progress-mini" style="flex:1"><div class="progress-mini-fill" style="width:${pct}%"></div></div>
+          </div>
+          <p class="text-xs text-muted mt-8">${s.reason || ""}</p>
+          <div class="flex-center mt-8" style="gap:6px;">
+            <span class="tag">Clarity: ${s.clarity || "—"}</span>
+            ${issues}
+          </div>
+          ${suggestions ? `<div class="tag-list mt-4">${suggestions}</div>` : ""}
+        </div>`;
+      }).join("");
+    } else {
+      container.innerHTML = `<div class="empty-state"><p class="text-muted">No section analysis available.</p></div>`;
+    }
+
+    // Feedback
+    const fb = job.feedback || {};
+    if (fb.summary) {
+      document.getElementById("summary-box").style.display = "block";
+      document.getElementById("summary-text").textContent = fb.summary;
+    }
+    populateList("strengths-list", fb.strengths, "✅");
+    populateList("weaknesses-list", fb.weaknesses, "⚠️");
+    populateList("suggestions-list", fb.suggestions, "💡");
+
+    // Downloads
+    setupDownload("download-refined", jobId, "refined");
+    setupDownload("download-report", jobId, "report");
 
   } catch (err) {
     alert("Failed to load result: " + err.message);
   }
 }
 
-function populateList(id, items) {
+function populateList(id, items, icon) {
   const el = document.getElementById(id);
+  if (!el) return;
   if (!items || !items.length) {
-    el.innerHTML = '<li class="text-muted">No data available</li>';
+    el.innerHTML = `<li class="text-muted text-sm">No data available.</li>`;
     return;
   }
-  el.innerHTML = items.map(item => `<li>${item}</li>`).join("");
+  el.innerHTML = items.map(item => `<li data-icon="${icon || ''}">${item}</li>`).join("");
 }
 
-function setupDownloadButton(id, jobId, type) {
-  const btn = document.getElementById(id);
+function setupDownload(btnId, jobId, type) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
   btn.addEventListener("click", () => {
     const token = localStorage.getItem("rpr_token");
     const url = `/api/download/${jobId}?type=${type}&token=${encodeURIComponent(token)}`;
     const a = document.createElement("a");
     a.href = url;
-    a.target = "_blank"; // Open in new tab for download
+    a.target = "_blank";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

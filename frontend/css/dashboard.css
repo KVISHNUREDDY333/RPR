@@ -1,108 +1,22 @@
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 32px;
+.score-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.3);
+  border-radius: 20px; padding: 3px 10px; font-size: 13px; font-weight: 700; color: var(--primary);
 }
-
-.stat-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 20px;
+.result-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 24px; }
+.feedback-section h3 { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
+.section-score-bar { display: flex; align-items: center; gap: 10px; }
+.section-score-bar .score-num { font-size: 13px; font-weight: 700; color: var(--primary); min-width: 32px; text-align: right; }
+.empty-state { text-align: center; padding: 48px 24px; color: var(--text-muted); }
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state h3 { font-size: 18px; color: var(--text); margin-bottom: 8px; }
+.profile-avatar {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), #818cf8);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 800; color: white; flex-shrink: 0;
 }
-
-.stat-card .stat-value {
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--primary);
-}
-
-.stat-card .stat-label {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-top: 4px;
-}
-
-.jobs-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.jobs-table th {
-  text-align: left;
-  padding: 12px 16px;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-muted);
-  border-bottom: 1px solid var(--border);
-}
-
-.jobs-table td {
-  padding: 14px 16px;
-  font-size: 14px;
-  border-bottom: 1px solid var(--border);
-}
-
-.jobs-table tr:last-child td { border-bottom: none; }
-.jobs-table tr:hover td { background: var(--surface2); }
-
-.upload-zone {
-  border: 2px dashed var(--border);
-  border-radius: 12px;
-  padding: 48px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.upload-zone:hover, .upload-zone.drag-over {
-  border-color: var(--primary);
-  background: rgba(79, 70, 229, 0.05);
-}
-
-.upload-zone .upload-icon { font-size: 48px; margin-bottom: 12px; }
-.upload-zone h3 { font-size: 18px; margin-bottom: 8px; }
-.upload-zone p { color: var(--text-muted); font-size: 14px; }
-
-.log-list {
-  list-style: none;
-  font-size: 13px;
-  font-family: monospace;
-  max-height: 200px;
-  overflow-y: auto;
-}
-
-.log-list li {
-  padding: 6px 0;
-  border-bottom: 1px solid var(--border);
-  color: var(--text-muted);
-}
-
-.log-list li span.step {
-  color: var(--primary);
-  margin-right: 8px;
-}
-
+.job-actions { display: flex; gap: 6px; align-items: center; }
 @media (max-width: 768px) {
-  .dashboard-grid { grid-template-columns: 1fr; }
+  .result-grid { grid-template-columns: 1fr; }
 }
-
-/* RPR v2 Specific Styles */
-.score-circle { width: 120px; height: 120px; border-radius: 50%; border: 8px solid var(--primary); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; margin: 0 auto 20px; color: var(--primary); }
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.section-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
-.progress-mini { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin: 8px 0; }
-.progress-mini-fill { height: 100%; background: var(--primary); }
-.tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-.tag { font-size: 11px; padding: 2px 8px; border-radius: 4px; background: rgba(0,0,0,0.05); color: var(--text-muted); border: 1px solid var(--border); }
-.feedback-box { padding: 20px; border-radius: 12px; margin-bottom: 24px; }
-.bg-strength { background: #f0fdf4; border: 1px solid #bbf7d0; }
-.bg-weakness { background: #fef2f2; border: 1px solid #fecaca; }
-.bg-suggestions { background: #f0f9ff; border: 1px solid #bae6fd; }
-
-.feedback-title-strength { color: #166534; }
-.feedback-title-weakness { color: #991b1b; }
-.feedback-title-suggestions { color: #075985; }
-.feedback-list { margin-top: 10px; padding-left: 20px; font-size: 14px; }

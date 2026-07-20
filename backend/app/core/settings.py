@@ -1,5 +1,4 @@
 from pydantic_settings import BaseSettings
-import os
 
 class Settings(BaseSettings):
     APP_NAME: str = "RPR"
@@ -10,8 +9,8 @@ class Settings(BaseSettings):
     MONGO_URI: str = "mongodb://localhost:27017"
     MONGO_DB: str = "rpr_db"
 
-    GEMINI_API_KEY: str = ""
-    GEMINI_MODEL: str = "gemini-2.0-flash"
+    GROQ_API_KEY: str = ""
+    GROQ_MODEL: str = "llama3-8b-8192"
 
     REDIS_URL: str = "redis://localhost:6379"
 

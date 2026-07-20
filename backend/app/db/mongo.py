@@ -1,15 +1,18 @@
 from backend.app.core.settings import settings
 
 _db = None
+_client = None
 _use_mock = False
 
+
 async def connect_db():
-    global _db, _use_mock
+    global _db, _client, _use_mock
     try:
         from motor.motor_asyncio import AsyncIOMotorClient
         import asyncio
         c = AsyncIOMotorClient(settings.MONGO_URI, serverSelectionTimeoutMS=3000)
         await asyncio.wait_for(c.admin.command("ping"), timeout=3)
+        _client = c
         _db = c[settings.MONGO_DB]
         print("[RPR] Connected to MongoDB")
     except Exception as e:
@@ -17,12 +20,13 @@ async def connect_db():
         _use_mock = True
         _db = _MockDB()
 
+
 async def close_db():
-    global _db, _use_mock
-    if _db and not _use_mock:
-        # motor client is attached to the db object
-        _db.client.close()
-        print("[RPR] MongoDB connection closed")
+    global _client
+    if _client is not None:
+        _client.close()
+        _client = None
+
 
 def get_db():
     return _db
@@ -47,14 +51,19 @@ class _MockCollection:
 
     async def update_one(self, query, update):
         doc = self._match(query)
-        if doc and "$set" in update:
+        if doc is not None and "$set" in update:
             doc.update(update["$set"])
+
+    async def delete_one(self, query):
+        doc = self._match(query)
+        if doc is not None:
+            self._docs.remove(doc)
+
+    async def delete_many(self, query):
+        self._docs = [d for d in self._docs if not all(d.get(k) == v for k, v in query.items())]
 
     def find(self, query=None):
         return _MockCursor(self._docs, query or {})
-
-    async def command(self, cmd):
-        return {"ok": 1}
 
     def _match(self, query):
         for doc in self._docs:
@@ -97,6 +106,3 @@ class _MockDB:
 
     def __getitem__(self, name):
         return self.__getattr__(name)
-
-    async def command(self, cmd):
-        return {"ok": 1}

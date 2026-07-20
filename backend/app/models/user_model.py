@@ -14,3 +14,8 @@ class UserOut(BaseModel):
     id: str
     name: str
     email: str
+
+class UserUpdate(BaseModel):
+    name: Optional[str] = None
+    current_password: Optional[str] = None
+    new_password: Optional[str] = None

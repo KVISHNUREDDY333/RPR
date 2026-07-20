@@ -3,60 +3,107 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Deep Review - RPR v2</title>
+  <title>Results — RPR</title>
   <link rel="stylesheet" href="../css/styles.css" />
   <link rel="stylesheet" href="../css/dashboard.css" />
 </head>
 <body>
   <nav>
-    <span class="nav-brand">RPR v2</span>
+    <span class="nav-brand">RPR <span>Results</span></span>
     <div class="nav-links">
-      <a href="dashboard.html" class="btn btn-outline">← Dashboard</a>
+      <a href="dashboard.html" class="btn btn-outline btn-sm">← Dashboard</a>
     </div>
   </nav>
 
-  <div class="container container-wide">
-    <div class="text-center mb-40">
-      <div class="score-circle" id="overall-score">0.0</div>
-      <h1>Academic Quality Analysis</h1>
-      <p class="text-muted" id="filename-display">Document Analysis</p>
-    </div>
+  <div class="container-sm">
 
-    <div class="grid-2">
-      <!-- Left Column: Section Analysis -->
-      <div>
-        <h2 class="mb-16">Section-wise Performance</h2>
-        <div id="sections-container">
-          <!-- Dynamically populated -->
+    <!-- Header -->
+    <div class="card mb-24 text-center" style="padding:32px;">
+      <div style="font-size:52px;margin-bottom:12px;">✅</div>
+      <h2 style="font-size:22px;margin-bottom:6px;">Analysis Complete</h2>
+      <p class="text-muted text-sm" id="filename-display">Document</p>
+      <div style="margin:20px auto 0;width:fit-content;">
+        <div class="score-ring" id="score-ring" style="--pct:0">
+          <span class="score-ring-value" id="overall-score">—</span>
         </div>
-      </div>
-
-      <!-- Right Column: Feedback & Actions -->
-      <div>
-        <h2 class="mb-16">Overall Feedback</h2>
-        
-        <div class="feedback-box bg-strength">
-          <h3 class="feedback-title-strength">✨ Strengths</h3>
-          <ul id="strengths-list" class="feedback-list"></ul>
-        </div>
-
-        <div class="feedback-box bg-weakness">
-          <h3 class="feedback-title-weakness">⚠️ Weaknesses</h3>
-          <ul id="weaknesses-list" class="feedback-list"></ul>
-        </div>
-
-        <div class="feedback-box bg-suggestions">
-          <h3 class="feedback-title-suggestions">💡 Actionable Suggestions</h3>
-          <ul id="suggestions-list" class="feedback-list"></ul>
-        </div>
-
-        <div class="card p-24">
-          <h3 class="mb-16">Download Documents</h3>
-          <button id="download-refined" class="btn btn-primary w-full justify-center mb-12">⬇️ Download Refined Paper</button>
-          <button id="download-report" class="btn btn-outline w-full justify-center">📄 Download Review Report</button>
-        </div>
+        <div class="text-xs text-muted mt-8">Overall Score / 10</div>
       </div>
     </div>
+
+    <!-- Stats Row -->
+    <div class="grid-3 mb-24">
+      <div class="stat-card text-center">
+        <div class="stat-value" id="word-count">—</div>
+        <div class="stat-label">Words</div>
+      </div>
+      <div class="stat-card text-center">
+        <div class="stat-value" id="proc-time">—</div>
+        <div class="stat-label">Process Time</div>
+      </div>
+      <div class="stat-card text-center">
+        <div class="stat-value" id="section-count">—</div>
+        <div class="stat-label">Sections</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" id="tab-sections" onclick="switchTab('sections')">Section Analysis</button>
+      <button class="tab" id="tab-feedback" onclick="switchTab('feedback')">Feedback</button>
+      <button class="tab" id="tab-download" onclick="switchTab('download')">Downloads</button>
+    </div>
+
+    <!-- Section Analysis -->
+    <div id="pane-sections">
+      <div id="sections-container"></div>
+    </div>
+
+    <!-- Feedback -->
+    <div id="pane-feedback" class="hidden">
+      <div class="card mb-16">
+        <div class="mb-16" id="summary-box" style="display:none;">
+          <h3 style="font-size:15px;margin-bottom:10px;">Summary</h3>
+          <p class="text-sm" id="summary-text"></p>
+        </div>
+        <div class="grid-2" style="gap:20px;">
+          <div>
+            <h3 style="font-size:14px;margin-bottom:10px;color:var(--success);">Strengths</h3>
+            <ul class="feedback-list" id="strengths-list"></ul>
+          </div>
+          <div>
+            <h3 style="font-size:14px;margin-bottom:10px;color:var(--error);">Weaknesses</h3>
+            <ul class="feedback-list" id="weaknesses-list"></ul>
+          </div>
+        </div>
+        <hr class="divider" />
+        <h3 style="font-size:14px;margin-bottom:10px;color:var(--warning);">Recommendations</h3>
+        <ul class="feedback-list" id="suggestions-list"></ul>
+      </div>
+    </div>
+
+    <!-- Downloads -->
+    <div id="pane-download" class="hidden">
+      <div class="card">
+        <div class="grid-2" style="gap:16px;">
+          <div class="card" style="background:var(--surface2);text-align:center;padding:28px;">
+            <div style="font-size:40px;margin-bottom:12px;">📝</div>
+            <h3 style="margin-bottom:8px;">Refined Paper</h3>
+            <p class="text-sm text-muted mb-16">AI-refined version of your document with improved clarity and academic tone.</p>
+            <button id="download-refined" class="btn btn-primary btn-full">Download Refined DOCX</button>
+          </div>
+          <div class="card" style="background:var(--surface2);text-align:center;padding:28px;">
+            <div style="font-size:40px;margin-bottom:12px;">📊</div>
+            <h3 style="margin-bottom:8px;">Review Report</h3>
+            <p class="text-sm text-muted mb-16">Detailed section-by-section analysis with scores, issues, and recommendations.</p>
+            <button id="download-report" class="btn btn-outline btn-full">Download Report DOCX</button>
+          </div>
+        </div>
+        <div class="info-box mt-16">
+          Similarity scores reflect semantic closeness to the original. Academic meaning is preserved throughout the refinement process.
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <script src="../js/api.js"></script>
@@ -64,7 +111,14 @@
   <script src="../js/download.js"></script>
   <script>
     requireAuth();
-    initResultV2();
+    initResult();
+
+    function switchTab(name) {
+      ["sections","feedback","download"].forEach(t => {
+        document.getElementById("pane-" + t).classList.toggle("hidden", t !== name);
+        document.getElementById("tab-" + t).classList.toggle("active", t === name);
+      });
+    }
   </script>
 </body>
 </html>

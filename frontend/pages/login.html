@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sign In - RPR</title>
+  <title>Sign In — RPR</title>
   <link rel="stylesheet" href="../css/styles.css" />
   <link rel="stylesheet" href="../css/auth.css" />
 </head>
@@ -13,24 +13,27 @@
       <h1>RPR</h1>
       <p>AI Research Paper Refinement</p>
     </div>
-    <h2>Sign In</h2>
+    <h2>Welcome back</h2>
 
     <div id="error" class="alert alert-error hidden"></div>
 
-    <form onsubmit="handleLogin(event)">
+    <form id="login-form">
       <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" placeholder="you@example.com" required />
+        <label for="email">Email address</label>
+        <input type="email" id="email" placeholder="you@university.edu" required autocomplete="email" />
       </div>
       <div class="form-group">
         <label for="password">Password</label>
-        <input type="password" id="password" placeholder="••••••••" required />
+        <div class="password-wrapper">
+          <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password" />
+          <button type="button" class="password-toggle" onclick="togglePassword('password', this)">👁</button>
+        </div>
       </div>
-      <button type="submit" id="submit-btn" class="btn btn-primary w-full justify-center">Sign In</button>
+      <button type="submit" id="submit-btn" class="btn btn-primary btn-full" style="margin-top:8px;">Sign In</button>
     </form>
 
-    <div class="auth-footer">
-      Don't have an account? <a href="signup.html">Create one</a>
+    <div class="auth-footer" style="margin-top:24px;">
+      Don't have an account? <a href="signup.html">Create one free</a>
     </div>
   </div>
 
@@ -38,6 +41,12 @@
   <script src="../js/auth.js"></script>
   <script>
     if (localStorage.getItem("rpr_token")) window.location.href = "dashboard.html";
+    document.getElementById("login-form").addEventListener("submit", handleLogin);
+    function togglePassword(id, btn) {
+      const el = document.getElementById(id);
+      el.type = el.type === "password" ? "text" : "password";
+      btn.textContent = el.type === "password" ? "👁" : "🙈";
+    }
   </script>
 </body>
 </html>

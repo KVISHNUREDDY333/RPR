@@ -3,50 +3,128 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard - RPR</title>
+  <title>Dashboard — RPR</title>
   <link rel="stylesheet" href="../css/styles.css" />
   <link rel="stylesheet" href="../css/dashboard.css" />
 </head>
 <body>
   <nav>
-    <span class="nav-brand">RPR</span>
+    <div class="flex-center">
+      <span class="nav-brand">RPR <span>Research Paper Refinement</span></span>
+    </div>
     <div class="nav-links">
-      <span class="text-muted text-14">Welcome, <strong id="user-name">...</strong></span>
-      <button class="btn btn-outline" onclick="logout()">Logout</button>
+      <span class="nav-user">Hello, <strong id="user-name">...</strong></span>
+      <button class="btn btn-outline btn-sm" onclick="showTab('profile')">Profile</button>
+      <button class="btn btn-outline btn-sm" onclick="logout()">Logout</button>
     </div>
   </nav>
 
   <div class="container">
-    <h2 class="mb-24">Upload Research Paper</h2>
 
-    <div class="card mb-32">
-      <div class="upload-zone" id="upload-zone">
-        <div class="upload-icon">📄</div>
-        <h3>Drop your file here or click to browse</h3>
-        <p>Supports PDF, DOCX, TXT (max 20MB)</p>
-        <input type="file" id="file-input" accept=".pdf,.docx,.txt" class="hidden" title="Upload research paper" placeholder="Upload research paper file" />
+    <!-- Stats -->
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-card"><div class="stat-value" id="stat-total">—</div><div class="stat-label">Total Jobs</div></div>
+      <div class="stat-card"><div class="stat-value" id="stat-completed">—</div><div class="stat-label">Completed</div></div>
+      <div class="stat-card"><div class="stat-value" id="stat-words">—</div><div class="stat-label">Words Processed</div></div>
+      <div class="stat-card"><div class="stat-value" id="stat-score">—</div><div class="stat-label">Avg. Score</div></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" id="tab-upload" onclick="showTab('upload')">Upload Paper</button>
+      <button class="tab" id="tab-jobs" onclick="showTab('jobs')">My Jobs</button>
+      <button class="tab" id="tab-profile" onclick="showTab('profile')">Profile</button>
+    </div>
+
+    <!-- Upload Tab -->
+    <div id="pane-upload">
+      <div class="card mb-24">
+        <div class="upload-zone" id="upload-zone">
+          <div class="upload-icon">📄</div>
+          <h3>Drop your research paper here</h3>
+          <p>Supports PDF, DOCX, DOC, TXT &nbsp;·&nbsp; Max 20MB</p>
+          <input type="file" id="file-input" accept=".pdf,.docx,.doc,.txt" class="hidden" />
+        </div>
+        <div class="flex-center mt-16" style="flex-wrap:wrap;gap:12px;">
+          <span id="file-info" class="hidden text-sm text-muted"></span>
+          <button id="upload-btn" class="btn btn-primary" disabled>
+            <span>🚀</span> Start AI Refinement
+          </button>
+        </div>
       </div>
-      <div class="mt-16 flex-wrap-gap">
-        <span id="file-info" class="hidden text-14 text-muted"></span>
-        <button id="upload-btn" class="btn btn-primary" disabled>Start Refinement</button>
+      <div class="info-box">
+        <strong>How it works:</strong> Upload your paper → AI reviews, scores, and refines each section → Download the refined document + detailed review report.
       </div>
     </div>
 
-    <h2 class="mb-16">Recent Jobs</h2>
-    <div class="card">
-      <p id="no-jobs" class="hidden text-muted text-center p-24">No jobs yet. Upload a paper to get started.</p>
-      <table class="jobs-table hidden" id="jobs-table">
-        <thead>
-          <tr>
-            <th>File</th>
-            <th>Status</th>
-            <th>Date</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="jobs-tbody"></tbody>
-      </table>
+    <!-- Jobs Tab -->
+    <div id="pane-jobs" class="hidden">
+      <div class="card">
+        <div id="jobs-empty" class="empty-state hidden">
+          <div class="empty-icon">📭</div>
+          <h3>No jobs yet</h3>
+          <p>Upload a paper to get started.</p>
+        </div>
+        <table class="jobs-table" id="jobs-table" style="display:none;">
+          <thead>
+            <tr>
+              <th>File</th>
+              <th>Status</th>
+              <th>Score</th>
+              <th>Words</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="jobs-tbody"></tbody>
+        </table>
+      </div>
     </div>
+
+    <!-- Profile Tab -->
+    <div id="pane-profile" class="hidden">
+      <div class="grid-2" style="align-items:start;">
+        <div class="card">
+          <div class="flex-center mb-24">
+            <div class="profile-avatar" id="profile-avatar">?</div>
+            <div>
+              <div style="font-size:18px;font-weight:700;" id="profile-name">—</div>
+              <div class="text-sm text-muted" id="profile-email">—</div>
+            </div>
+          </div>
+          <hr class="divider" />
+          <h3 style="font-size:15px;margin-bottom:16px;">Update Profile</h3>
+          <div id="profile-msg" class="hidden"></div>
+          <form id="profile-form">
+            <div class="form-group">
+              <label>Display Name</label>
+              <input type="text" id="new-name" placeholder="Your name" />
+            </div>
+            <hr class="divider" />
+            <h3 style="font-size:14px;margin-bottom:14px;color:var(--text-muted);">Change Password</h3>
+            <div class="form-group">
+              <label>Current Password</label>
+              <input type="password" id="cur-password" placeholder="Current password" />
+            </div>
+            <div class="form-group">
+              <label>New Password</label>
+              <input type="password" id="new-password" placeholder="Min 8 characters" minlength="8" />
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">Save Changes</button>
+          </form>
+        </div>
+        <div class="card">
+          <h3 style="font-size:15px;margin-bottom:16px;">Account Statistics</h3>
+          <div style="display:grid;gap:12px;">
+            <div class="stat-card"><div class="stat-value" id="p-total">—</div><div class="stat-label">Total Jobs</div></div>
+            <div class="stat-card"><div class="stat-value" id="p-completed">—</div><div class="stat-label">Completed</div></div>
+            <div class="stat-card"><div class="stat-value" id="p-words">—</div><div class="stat-label">Words Processed</div></div>
+            <div class="stat-card"><div class="stat-value" id="p-score">—</div><div class="stat-label">Avg. Score</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <script src="../js/api.js"></script>
@@ -57,6 +135,13 @@
     requireAuth();
     initDashboard();
     initUpload();
+
+    function showTab(name) {
+      ["upload","jobs","profile"].forEach(t => {
+        document.getElementById("pane-" + t).classList.toggle("hidden", t !== name);
+        document.getElementById("tab-" + t).classList.toggle("active", t === name);
+      });
+    }
   </script>
 </body>
 </html>

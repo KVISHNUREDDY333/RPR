@@ -1,17 +1,13 @@
 from backend.app.llm.llm_service import call_llm
+from backend.app.llm.prompts import REVIEW_PROMPT
 
-REVIEW_PROMPT = """Analyze the following research paper section for academic excellence.
-Focus on clarity, research depth, and writing quality.
-
-Return valid JSON:
-{
-  "clarity_rating": "string (clear/moderate/needs-work)",
-  "depth_analysis": "string",
-  "issues": ["string"],
-  "improvement_suggestions": "string"
-}
-"""
-
-async def review_section(content: str) -> dict:
-    """Analyze a single section and return structured review data."""
-    return await call_llm(REVIEW_PROMPT, content, is_json=True)
+async def review_section(text: str) -> dict:
+    try:
+        result = await call_llm(REVIEW_PROMPT, text, is_json=True)
+        return {
+            "clarity_rating": result.get("clarity_rating", "Medium"),
+            "issues": result.get("issues", []),
+            "suggestions": result.get("suggestions", [])
+        }
+    except Exception:
+        return {"clarity_rating": "Medium", "issues": [], "suggestions": []}
